@@ -7,8 +7,8 @@ public class Player : MonoBehaviour
     public float moveSpeed;
     float xInput, yInput;
     new Rigidbody rigidbody;
-   public  GameObject bomb;
-    
+    public  GameObject bomb;
+    public int power, bombs;
 
     void Start()
     {
@@ -36,14 +36,30 @@ public class Player : MonoBehaviour
 
     void PlaceBomb()
     {
-        float xPos =Mathf.Ceil( transform.position.x);
-        float yPos = Mathf.Ceil(transform.position.y);
+        if (bombs > 0)
+        {
+            float xPos = Mathf.Ceil(transform.position.x);
+            float yPos = Mathf.Ceil(transform.position.y);
 
-        Vector2 BombPos = new Vector2(xPos - .5f, yPos - .5f);
-       
+            Vector2 BombPos = new Vector2(xPos - .5f, yPos - .5f);
 
+            if (!GameManager.Instance.BomPoses.Contains(BombPos))
+            {
 
-        Instantiate(bomb, BombPos,Quaternion.identity);
+                Instantiate(bomb, BombPos, Quaternion.identity).GetComponent<Bomb>().size = power;
+                bombs--;
+                StartCoroutine(BombExplode(BombPos));
+
+                GameManager.Instance.BomPoses.Add(BombPos);
+            }
+        }
     }
 
+
+    IEnumerator BombExplode(Vector2 bombpos)
+    {
+        yield return new WaitForSeconds(2);
+        bombs++;
+        GameManager.Instance.BomPoses.Remove(bombpos);
+    }
 }

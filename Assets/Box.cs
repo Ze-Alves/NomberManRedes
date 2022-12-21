@@ -7,10 +7,8 @@ using UnityEngine.Tilemaps;
 public class Box : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+   
+    public bool active = true;
 
     // Update is called once per frame
     void Update()
@@ -20,7 +18,9 @@ public class Box : MonoBehaviour
 
     //private void OnCollisionEnter2D(Collision2D collision)
     //{
-      
+
     //    Destroy(gameObject);
     //}
+
+  
 }
