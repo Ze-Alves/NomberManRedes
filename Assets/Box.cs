@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.Tilemaps;
-using UnityEngine.Tilemaps;
+
 
 public class Box : MonoBehaviour
 {
