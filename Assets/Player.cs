@@ -10,6 +10,7 @@ public class Player : NetworkBehaviour
     float xInput, yInput;
     new Rigidbody rigidbody;
     public  GameObject bomb;
+
     public int power, bombs;
     
     void Start()
@@ -18,7 +19,7 @@ public class Player : NetworkBehaviour
         //if (IsOwner)
         //    GameManager.Instance.UpdateCountServerRpc();
         
-        Debug.Log("sadasd"+transform.position);
+        //Debug.Log("sadasd"+transform.position);
        
         rigidbody = GetComponent<Rigidbody>();
 
@@ -49,7 +50,7 @@ public class Player : NetworkBehaviour
 
     void PlaceBomb()
     {
-        Debug.Log("lool"+bombs);
+        //Debug.Log("lool"+bombs);
         if (bombs > 0)
         {
             float xPos = Mathf.Ceil(transform.position.x);
@@ -59,8 +60,9 @@ public class Player : NetworkBehaviour
 
             if (!GameManager.Instance.BomPoses.Contains(BombPos))
             {
+                PlaceBombServerRpc(BombPos);
+                //Instantiate(bomb, BombPos, Quaternion.identity).GetComponent<Bomb>().size = power;
 
-                Instantiate(bomb, BombPos, Quaternion.identity).GetComponent<Bomb>().size = power;
                 bombs--;
                 StartCoroutine(BombExplode(BombPos));
 
@@ -68,6 +70,30 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    [ServerRpc]
+    void PlaceBombServerRpc(Vector2 pos)
+    {
+        //NetworkObject bombe = Instantiate(bomb, pos, Quaternion.identity);
+        //bombe.gameObject.GetComponent<Bomb>().size = power;
+        //bombe.Spawn();
+        //bombe.SpawnWithOwnership(NetworkManager.Singleton.LocalClientId);
+        //Debug.Log("QQQQQQQ");
+        PlaceBombClientRpc(pos);
+    }
+
+    [ClientRpc]
+    void PlaceBombClientRpc(Vector2 pos)
+    {
+        //obj.
+        //bombe.gameObject.GetComponent<Bomb>().size = power;
+        Bomb bombe = Instantiate(bomb, pos, Quaternion.identity).GetComponent<Bomb>();
+        bombe.size = power;
+        bombe.owner = this;
+        //bombe.gameObject.GetComponent<NetworkObject>().Spawn();
+        Debug.Log("QQQQQQQFFFFFF");
+    }
+
 
 
     IEnumerator BombExplode(Vector2 bombpos)

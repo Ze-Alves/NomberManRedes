@@ -13,9 +13,8 @@ GameObject:
   - component: {fileID: 8188769419703998712}
   - component: {fileID: 9077322803026622118}
   - component: {fileID: 2627838375895840113}
-  - component: {fileID: 5745860836858437856}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: Bomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104,7 +103,7 @@ MonoBehaviour:
   - {fileID: 4617930752442479795, guid: 8fba9ae6dcb8b4f40810a79796811108, type: 3}
   - {fileID: 2231693964972917489, guid: f58bf689492f815458c5a3d491aa2bbf, type: 3}
   - {fileID: 3145433864822035279, guid: c75f66c431c4d6744a2e2543eaf68d74, type: 3}
-  probi: 20
+  probi: 90
   size: 3
   Explosionx: {fileID: 6754846574936597323, guid: 24433226f73f3e44aae01910ae0889e5, type: 3}
   Explosiony: {fileID: 8199773726550679880, guid: e9a4408af91d1ba4ba3a33d2fe8f3bce, type: 3}
@@ -113,6 +112,7 @@ MonoBehaviour:
   centro: {fileID: 7526641703947242880, guid: d48b7d07d6bdd2e489d48a8cf90020cb, type: 3}
   animator: {fileID: 2627838375895840113}
   animation: {fileID: 0}
+  owner: {fileID: 0}
 --- !u!61 &9077322803026622118
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -159,19 +159,3 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &5745860836858437856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4277798018512416624}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1

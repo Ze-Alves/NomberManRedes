@@ -12,9 +12,12 @@ public sealed class GameManager : NetworkBehaviour
     public List<Vector2> BomPoses = new List<Vector2>();
     public int size;
     public Vector2 origin;
+    public GameObject player;
+    public List<GameObject> Items;
+    public List <Box> boxes;
     //public string[,] grid;
 
-    
+
 
     public int PlayerConnected=0;
 
@@ -79,13 +82,14 @@ public sealed class GameManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(PlayerConnected + "WWWWW");
+        //Debug.Log(PlayerConnected + "WWWWW");
     }
 
     public void HandleServerStart()
     {
         if (IsOwner)
             UpdateCountServerRpc();
+        //Instantiate(player);
     }
 
     public void HandleClientConnected(ulong cID)
@@ -100,7 +104,7 @@ public sealed class GameManager : NetworkBehaviour
     public void UpdateCountServerRpc()
     {
         PlayerConnected = NetworkManager.Singleton.ConnectedClients.Count;
-        Debug.Log("AAAAAAAAAA" + PlayerConnected);
+        //Debug.Log("AAAAAAAAAA" + PlayerConnected);
         UpdateCountClientRpc(PlayerConnected);
     }
 
@@ -109,13 +113,29 @@ public sealed class GameManager : NetworkBehaviour
     public void UpdateCountClientRpc(int count)
     {
         PlayerConnected = count;
-        Debug.Log("AAAAAAAAAABBBBBBBBBBBB" + PlayerConnected);
+        //Debug.Log("AAAAAAAAAABBBBBBBBBBBB" + PlayerConnected);
 
         //NetworkManager.Singleton.LocalClientId
     }
 
+    [ServerRpc]
+    public void BoxServerRpc(int r,Vector2 pos)
+    {
+        
+        BoxClientRpc(r,pos);
+    }
 
-public void CreateHost()
+
+    [ClientRpc]
+    public void BoxClientRpc(int r,Vector2 pos)
+    {
+        Debug.Log("GRAU");
+        Instantiate(Items[r], pos, Quaternion.identity);
+        //Debug.Log("AAAAAAAAAABBBBBBBBBBBB" + PlayerConnected);
+
+        //NetworkManager.Singleton.LocalClientId
+    }
+    public void CreateHost()
     {
         NetworkManager.Singleton.StartHost();
     }

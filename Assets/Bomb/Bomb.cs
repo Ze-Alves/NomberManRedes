@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class Bomb : MonoBehaviour
 {
     public List<GameObject> Items;
+    
     public int probi;
     public int size = 2;
     //public float xsize, ysize;
@@ -13,6 +15,8 @@ public class Bomb : MonoBehaviour
     public GameObject Explosionx, Explosiony,ExplosionEndx,ExplosionEndy,centro;
     public Animator animator;
     public Animation animation;
+    public Player owner;
+    public NetworkBehaviourReference refer;
 
     void Start()
     {
@@ -226,15 +230,55 @@ public class Bomb : MonoBehaviour
     void BoxDestroy(GameObject box)
     {
 
+        //int r = Random.Range(0, Items.Count);
+        //int prob = Random.Range(0, 100);
+        //if (prob < probi)
+        //{
+
+        //    //BoxDestroyServerRpc(box, r);
+        //    Instantiate(Items[r], box.transform.position, Quaternion.identity);
+        //}
+        //Debug.Log(IsLocalPlayer + "" + IsSpawned + "" + IsOwnedByServer + "" + IsServer + "" + IsHost);
+
+        //if (IsOwnedByServer)
+        //{
+        //    Debug.Log("KKKKKKKKKKKKK");
+        //    BoxDestroyServerRpc(box.transform.position);
+        //}
+        //Destroy(box);
+
+        //NetworkBehaviour me;
+        //if(refer.TryGet(out me,NetworkManager.Singleton))
+        //{
+        //    Debug.Log("Meeme");
+        //    if (me == this)
+        //        Debug.Log("YESSSSSSSSSSSSSS");
+        //}
+        box.GetComponent<Box>().Exploded();
+    }
+
+    [ServerRpc]
+    void BoxDestroyServerRpc(Vector3 pos)
+    {
+        Debug.Log("OOOOOOOOOOOOOOOOOOOOOOO");
         int r = Random.Range(0, Items.Count);
         int prob = Random.Range(0, 100);
         if (prob < probi)
         {
-            Instantiate(Items[r], box.transform.position, Quaternion.identity);
-        }
 
-        Destroy(box);
+            //BoxDestroyServerRpc(box, r);
+            BoxDestroyClientRpc(r,pos);
+
+        }
     }
+
+    [ClientRpc]
+    void BoxDestroyClientRpc(int r,Vector3 pos)
+    {
+        Instantiate(Items[r], pos, Quaternion.identity);
+        Debug.Log("EEEEEEEEEEEEEEE");
+    }
+
 
     private void OnTriggerExit2D(Collider2D collision)
     {
