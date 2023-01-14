@@ -6,13 +6,13 @@ using Unity.Netcode;
 
 public class Player : NetworkBehaviour
 {
-    public float moveSpeed;
+    public int moveSpeed;
     float xInput, yInput;
     new Rigidbody rigidbody;
     public  GameObject bomb;
     public GameObject PStats;
     GameObject stats;
-    public int power, bombs;
+    public int power, bombCount;
     int playerNumber;
     
     void Start()
@@ -28,6 +28,7 @@ public class Player : NetworkBehaviour
         if(IsOwner)
         PlayerNumServerRpc();
         StartCoroutine(UpdatePos());
+        
     }
 
     [ServerRpc]
@@ -61,7 +62,7 @@ public class Player : NetworkBehaviour
     {
         //Debug.Log("lool"+bombs);
 
-        if (bombs > 0)
+        if (bombCount > 0)
         {
             float xPos = Mathf.Ceil(transform.position.x);
             float yPos = Mathf.Ceil(transform.position.y);
@@ -75,7 +76,7 @@ public class Player : NetworkBehaviour
                 PlaceBombServerRpc(BombPos);
                 //Instantiate(bomb, BombPos, Quaternion.identity).GetComponent<Bomb>().size = power;
 
-                bombs--;
+                bombCount--;
                 StartCoroutine(BombExplode(BombPos));
 
                 GameManager.Instance.BomPoses.Add(BombPos);
@@ -112,7 +113,7 @@ public class Player : NetworkBehaviour
     IEnumerator BombExplode(Vector2 bombpos)
     {
         yield return new WaitForSeconds(2);
-        bombs++;
+        bombCount++;
         GameManager.Instance.BomPoses.Remove(bombpos);
     }
 
@@ -171,22 +172,34 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void ChangeStatusServerRpc(int type)
     {
-        switch (type)
+                stats.GetComponent<PlayerStats>().Power.Value=power;
+                stats.GetComponent<PlayerStats>().bombCount.Value=bombCount;
+                stats.GetComponent<PlayerStats>().Speed.Value=moveSpeed;
+    }
+
+    public void ResetSats()
+    {
+        power = 1;
+        moveSpeed = 7;
+        bombCount = 1;
+        if(IsOwner)
+        ChangeStatusServerRpc(0);
+
+        if (IsOwner)
         {
-            case 1:
-                stats.GetComponent<PlayerStats>().Power.Value++;
-                break;
-            case 2:
-                stats.GetComponent<PlayerStats>().bombCount.Value++;
-                break;
-            case 3:
-                stats.GetComponent<PlayerStats>().Speed.Value++;
-                break;
+            Vector3 Posi = new Vector3(0, 0, 0);
+            switch (playerNumber)
+            {
+                case 1:
+                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    break;
+                case 2:
+                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    break;
 
+            }
+            transform.position = Posi;
         }
-            
-
-        
     }
 
     public void ItemPick(Item.ItemType type)
@@ -201,7 +214,7 @@ public class Player : NetworkBehaviour
             case Item.ItemType.Bombs:
                 if(IsOwner)
                 ChangeStatusServerRpc(2);
-                bombs++;
+                bombCount++;
                 break;
             case Item.ItemType.Speed:
                 if (IsOwner)

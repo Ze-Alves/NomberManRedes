@@ -47,25 +47,24 @@ public class Box : NetworkBehaviour//MonoBehaviour
     public void Exploded()
     {
         //dead = true;
-        int r = 2;
         if(IsOwner)
-        BoxDestroyServerRpc(r);
+        BoxDestroyServerRpc();
     }
 
 
     [ServerRpc]
-    void BoxDestroyServerRpc(int r)
+    void BoxDestroyServerRpc()
     {
-        //BoxDestroyClientRpc(r);
-        GetComponent<NetworkObject>().Despawn();
+        BoxDestroyClientRpc();
+        //GetComponent<NetworkObject>().Despawn();
         //Destroy(gameObject);
     }
 
     [ClientRpc]
-    void BoxDestroyClientRpc(int r)
+    void BoxDestroyClientRpc()
     {
-       
 
+        gameObject.SetActive(false);
         //Instantiate(Items[r],transform.position, Quaternion.identity);
     }
 
@@ -83,5 +82,10 @@ public class Box : NetworkBehaviour//MonoBehaviour
             GameManager.Instance.BoxServerRpc(item, transform.position);
     }
 
+    private void OnDisable()
+    {
+        if (spawn && IsOwner)
+            GameManager.Instance.BoxServerRpc(item, transform.position);
+    }
 
 }

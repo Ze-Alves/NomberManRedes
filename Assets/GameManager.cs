@@ -15,50 +15,17 @@ public sealed class GameManager : NetworkBehaviour
     public Vector2 origin;
     public GameObject player;
     public List<GameObject> Items;
-    public GameObject Level;
-    
-    //public string[,] grid;
-
-
-
+    public GameObject Boxes;
     public int PlayerConnected=0;
 
     private void Awake()
     {
-
         if (Instance != null && Instance != this)
         {
             Destroy(this);
             return;
         }
         Instance = this;
-        //grid = new string[size, size];
-
-        //Vector3 RaycastPos;
-        //RaycastHit hit;
-
-
-        //for(int i = -size / 2; i < size / 2; i++)
-        //{
-        //    RaycastPos = new Vector3(origin.x, i + .5f, -1f);
-
-
-        //    for(int j = -size / 2; j < size / 2; j++)
-        //    {
-        //        if(Physics.Raycast(RaycastPos,new Vector3(0,0,1),out hit))
-        //        {
-        //            //if (hit.transform.tag == "Box")
-        //            //    grid[i, j] = "Box";
-
-        //            grid[i+size/2, j+size/2] = hit.transform.tag;
-        //            Debug.Log("AAA");
-        //            //break;
-        //        }
-
-        //        RaycastPos.x++;
-
-        //    }
-        //}
     }
 
     void Start()
@@ -66,9 +33,6 @@ public sealed class GameManager : NetworkBehaviour
 
         NetworkManager.Singleton.OnServerStarted += HandleServerStart;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
-
-
-        //Debug.Log("MUUUUUU"+FindObjectOfType<RestartManager>().transform.name);
 
         try
         {
@@ -98,25 +62,18 @@ public sealed class GameManager : NetworkBehaviour
         #endregion
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //Debug.Log(PlayerConnected + "WWWWW");
     }
+
+
 
     public void HandleServerStart()
     {
         if (IsOwner)
         {
             UpdateCountServerRpc();
-            //SceneManager.LoadScene("Level", LoadSceneMode.Additive);
-            //GameObject gs = Instantiate(player);
-            //player.GetComponent<NetworkObject>();
-
-
-
         }
-        //Instantiate(player);
     }
 
     public void HandleClientConnected(ulong cID)
@@ -131,7 +88,6 @@ public sealed class GameManager : NetworkBehaviour
     public void UpdateCountServerRpc()
     {
         PlayerConnected = NetworkManager.Singleton.ConnectedClients.Count;
-        //Debug.Log("AAAAAAAAAA" + PlayerConnected);
         UpdateCountClientRpc(PlayerConnected);
     }
 
@@ -140,15 +96,11 @@ public sealed class GameManager : NetworkBehaviour
     public void UpdateCountClientRpc(int count)
     {
         PlayerConnected = count;
-        //Debug.Log("AAAAAAAAAABBBBBBBBBBBB" + PlayerConnected);
-
-        //NetworkManager.Singleton.LocalClientId
     }
 
     [ServerRpc]
     public void BoxServerRpc(int r,Vector2 pos)
     {
-        
         BoxClientRpc(r,pos);
     }
 
@@ -158,10 +110,8 @@ public sealed class GameManager : NetworkBehaviour
     {
         Debug.Log("GRAU");
         Instantiate(Items[r], pos, Quaternion.identity);
-        //Debug.Log("AAAAAAAAAABBBBBBBBBBBB" + PlayerConnected);
-
-        //NetworkManager.Singleton.LocalClientId
     }
+
     public void CreateHost()
     {
         Debug.Log("BOP");
@@ -174,5 +124,39 @@ public sealed class GameManager : NetworkBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
+    
+    public void RestartMatch()
+    {
+        if (IsServer)
+            RestartMatchServerRpc();
+    }
+
+    [ServerRpc]
+    void RestartMatchServerRpc()
+    {
+        RestartMatchClientRpc();
+    }
+
+    [ClientRpc]
+    void RestartMatchClientRpc()
+    {
+        for (int i = 0; i < Boxes.transform.childCount; i++)
+        {
+            Boxes.transform.GetChild(i).gameObject.SetActive(true);
+        }
+        
+
+
+        foreach(Item item in Object.FindObjectsOfType<Item>())
+        {
+            Destroy(item.gameObject);
+        }
+
+        foreach (Player player in FindObjectsOfType<Player>(true))
+        {
+            player.gameObject.SetActive(true);
+            player.ResetSats();
+        }
+    }
 
 }
