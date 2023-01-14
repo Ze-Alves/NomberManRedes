@@ -34,7 +34,7 @@ public class Box : NetworkBehaviour//MonoBehaviour
     }
     void Update()
     {
-        Debug.Log(IsLocalPlayer + "" + IsSpawned + "" + IsOwnedByServer + "" + IsServer + "" + IsHost);
+        //Debug.Log(IsLocalPlayer + "" + IsSpawned + "" + IsOwnedByServer + "" + IsServer + "" + IsHost);
 
         if (dead)
         {

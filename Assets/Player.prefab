@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 7
   bomb: {fileID: 4277798018512416624, guid: cb81b06c0a637af4b87c6515fdf649a6, type: 3}
+  PStats: {fileID: 5076705660249572696, guid: 37e814c79eb7b734ea2a10d9f082f993, type: 3}
   power: 1
   bombs: 2
 --- !u!114 &3192939707269621339

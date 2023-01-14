@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 public sealed class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set;}
@@ -14,7 +15,8 @@ public sealed class GameManager : NetworkBehaviour
     public Vector2 origin;
     public GameObject player;
     public List<GameObject> Items;
-    public List <Box> boxes;
+    public GameObject Level;
+    
     //public string[,] grid;
 
 
@@ -65,6 +67,23 @@ public sealed class GameManager : NetworkBehaviour
         NetworkManager.Singleton.OnServerStarted += HandleServerStart;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
 
+
+        //Debug.Log("MUUUUUU"+FindObjectOfType<RestartManager>().transform.name);
+
+        try
+        {
+            if (!IsOwnedByServer&&FindObjectOfType<RestartManager>()!=null)
+            {
+                
+                if (FindObjectOfType<RestartManager>().host)
+                {
+                    CreateHost();
+                }
+                else
+                    Client();
+            }
+        }
+        catch { }
         #region trash
         //for (int i = 0; i < size; i++)
         //{
@@ -88,7 +107,15 @@ public sealed class GameManager : NetworkBehaviour
     public void HandleServerStart()
     {
         if (IsOwner)
+        {
             UpdateCountServerRpc();
+            //SceneManager.LoadScene("Level", LoadSceneMode.Additive);
+            //GameObject gs = Instantiate(player);
+            //player.GetComponent<NetworkObject>();
+
+
+
+        }
         //Instantiate(player);
     }
 
@@ -137,6 +164,7 @@ public sealed class GameManager : NetworkBehaviour
     }
     public void CreateHost()
     {
+        Debug.Log("BOP");
         NetworkManager.Singleton.StartHost();
     }
 

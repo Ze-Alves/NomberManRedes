@@ -16,18 +16,8 @@ public class Item : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            switch (type)
-            {
-                case ItemType.Power:
-                    other.GetComponent<Player>().power++;
-                    break;
-                case ItemType.Bombs:
-                    other.GetComponent<Player>().bombs++;
-                    break;
-                case ItemType.Speed:
-                    other.GetComponent<Player>().moveSpeed++;
-                    break;
-            }
+            other.GetComponent<Player>().ItemPick(type);
+         
 
             Destroy(gameObject);
         }

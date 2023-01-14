@@ -10,8 +10,10 @@ public class Player : NetworkBehaviour
     float xInput, yInput;
     new Rigidbody rigidbody;
     public  GameObject bomb;
-
+    public GameObject PStats;
+    GameObject stats;
     public int power, bombs;
+    int playerNumber;
     
     void Start()
     {
@@ -23,9 +25,16 @@ public class Player : NetworkBehaviour
        
         rigidbody = GetComponent<Rigidbody>();
 
+        if(IsOwner)
+        PlayerNumServerRpc();
         StartCoroutine(UpdatePos());
     }
 
+    [ServerRpc]
+    void PlayerNumServerRpc()
+    {
+        playerNumber = NetworkManager.Singleton.ConnectedClients.Count;
+    }
 
     void Update()
     {
@@ -51,10 +60,13 @@ public class Player : NetworkBehaviour
     void PlaceBomb()
     {
         //Debug.Log("lool"+bombs);
+
         if (bombs > 0)
         {
             float xPos = Mathf.Ceil(transform.position.x);
             float yPos = Mathf.Ceil(transform.position.y);
+            //StatusClientRpc();
+            //ChangeStatusServerRpc();
 
             Vector2 BombPos = new Vector2(xPos - .5f, yPos - .5f);
 
@@ -87,6 +99,7 @@ public class Player : NetworkBehaviour
     {
         //obj.
         //bombe.gameObject.GetComponent<Bomb>().size = power;
+
         Bomb bombe = Instantiate(bomb, pos, Quaternion.identity).GetComponent<Bomb>();
         bombe.size = power;
         bombe.owner = this;
@@ -110,22 +123,91 @@ public class Player : NetworkBehaviour
             yield return new WaitForSeconds(.3f);
 
 
-            Vector3 pos = new Vector3(0, 0, 0);
+            Vector3 Posi = new Vector3(0, 0, 0);
+            Vector3 statusPos=PStats.transform.position;
             switch (GameManager.Instance.PlayerConnected)
             {
                 case 1:
-                    pos = new Vector3(1.5f, 3.5f, 0);
+                    Posi = new Vector3(1.5f, 3.5f, 0);
                     break;
                 case 2:
-                    pos = new Vector3(1.5f, -3.5f, 0);
+                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    statusPos.y -= 3.5f;
                     break;
 
             }
-            transform.position = pos;
+            transform.position = Posi;
+
+            StatusServerRpc(statusPos);
         }
             GetComponent<SpriteRenderer>().enabled = true;
             //Debug.Log(pos+"UUUUUUUUUU"+transform.position+GameManager.Instance.PlayerConnected);
 
         
+    }
+
+    [ServerRpc]
+    void StatusServerRpc(Vector2 pos)
+    {
+        stats = Instantiate(PStats, pos, Quaternion.identity);
+
+        stats.GetComponent<NetworkObject>().Spawn();
+
+        stats.GetComponent<PlayerStats>().PlayerNum.Value=playerNumber;
+        StatusClientRpc(pos);
+
+    }
+
+    [ClientRpc]
+    void StatusClientRpc(Vector3 pos)
+    {
+        Debug.Log("RRRRRRRRR");
+        //stats = Instantiate(PStats, pos, Quaternion.identity);
+        //stats.GetComponent<PlayerStats>().p++;
+        Debug.Log("RAR");
+
+    }
+
+    [ServerRpc]
+    void ChangeStatusServerRpc(int type)
+    {
+        switch (type)
+        {
+            case 1:
+                stats.GetComponent<PlayerStats>().Power.Value++;
+                break;
+            case 2:
+                stats.GetComponent<PlayerStats>().bombCount.Value++;
+                break;
+            case 3:
+                stats.GetComponent<PlayerStats>().Speed.Value++;
+                break;
+
+        }
+            
+
+        
+    }
+
+    public void ItemPick(Item.ItemType type)
+    {
+        switch (type)
+        {
+            case Item.ItemType.Power:
+                if (IsOwner)
+                    ChangeStatusServerRpc(1);
+                power++;
+                break;
+            case Item.ItemType.Bombs:
+                if(IsOwner)
+                ChangeStatusServerRpc(2);
+                bombs++;
+                break;
+            case Item.ItemType.Speed:
+                if (IsOwner)
+                    ChangeStatusServerRpc(3);
+                moveSpeed++;
+                break;
+        }
     }
 }
