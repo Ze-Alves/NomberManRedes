@@ -5,18 +5,25 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using TMPro;
+using Unity.Netcode.Transports.UNET;
+using System.Net.Sockets;
+using System.Net;
 public sealed class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set;}
 
     [HideInInspector]
     public List<Vector2> BomPoses = new List<Vector2>();
-    public int size;
-    public Vector2 origin;
     public GameObject player;
     public List<GameObject> Items;
     public GameObject Boxes;
     public int PlayerConnected=0;
+    public TextMeshProUGUI IP;
+    public GameObject UIStuff;
+    public TMP_InputField ipunt;
+    UNetTransport Transport;
+    string IPAd;
 
     private void Awake()
     {
@@ -48,6 +55,11 @@ public sealed class GameManager : NetworkBehaviour
             }
         }
         catch { }
+
+        Transport = NetworkManager.Singleton.GetComponent<UNetTransport>();
+        IPStuff();
+
+
         #region trash
         //for (int i = 0; i < size; i++)
         //{
@@ -60,6 +72,20 @@ public sealed class GameManager : NetworkBehaviour
         //    }
         //}
         #endregion
+    }
+
+    void IPStuff()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                
+                IP.text = Transport.ConnectAddress + "  " + ip.ToString();
+                IPAd = ip.ToString(); 
+            }
+        }
     }
 
     void Update()
@@ -114,17 +140,33 @@ public sealed class GameManager : NetworkBehaviour
 
     public void CreateHost()
     {
-        Debug.Log("BOP");
+   
+        GameObject.Find("StartGame").SetActive(false);
         NetworkManager.Singleton.StartHost();
+        
     }
 
     public void Client()
     {
-       
+
+        string g= ipunt.text;
+
+        Transport.ConnectAddress = g; //
+        
+
+        GameObject.Find("StartGame").SetActive(false);
         NetworkManager.Singleton.StartClient();
+       
     }
 
-    
+    public void ClientConnectMenu()
+    {
+        GameObject.Find("Host").SetActive(false);
+        GameObject.Find("Client").SetActive(false);
+        UIStuff.SetActive(true);
+    }
+
+
     public void RestartMatch()
     {
         if (IsServer)
