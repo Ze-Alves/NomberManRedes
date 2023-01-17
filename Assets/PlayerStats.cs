@@ -15,6 +15,10 @@ public class PlayerStats : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        bombs.text = "Bombs:" + bombCount.Value.ToString();
+        power.text = "Power:" + Power.Value.ToString();
+        speed.text = "Speed:" + Speed.Value.ToString();
+
         Power.OnValueChanged += UpdateStats;
         bombCount.OnValueChanged += UpdateStats;
         Speed.OnValueChanged += UpdateStats;
