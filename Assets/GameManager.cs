@@ -96,7 +96,7 @@ public sealed class GameManager : NetworkBehaviour
             IsGame_Active.Value = false;
             StartB.SetActive(true);
 
-            Debug.Log("MOOOOOOOOOOOOOOOOOOOOOO");
+           
         }
     }
 
