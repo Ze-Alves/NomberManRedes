@@ -14,7 +14,6 @@ public class Player : NetworkBehaviour
     GameObject stats;
     public int power, bombCount;
     int playerNumber;
-    Animator anim;
     
     void Start()
     {
@@ -25,7 +24,6 @@ public class Player : NetworkBehaviour
         //Debug.Log("sadasd"+transform.position);
        
         rigidbody = GetComponent<Rigidbody>();
-        anim = GetComponent<Animator>();
 
         if(IsOwner)
         PlayerNumServerRpc();
@@ -46,17 +44,9 @@ public class Player : NetworkBehaviour
             xInput = Input.GetAxis("Horizontal");
             yInput = Input.GetAxis("Vertical");
 
-            setAnimation();
-
             if (Input.GetKeyDown(KeyCode.E))
                 PlaceBomb();
         }
-    }
-    void setAnimation()
-    {
-        anim.SetFloat("X", xInput);
-        anim.SetFloat("Y", yInput);
-
     }
 
     private void FixedUpdate()
