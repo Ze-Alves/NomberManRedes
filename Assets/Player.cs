@@ -39,7 +39,7 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
-        if (IsOwner)
+        if (IsOwner && GameManager.Instance.IsGame_Active.Value)
         {
             xInput = Input.GetAxis("Horizontal");
             yInput = Input.GetAxis("Vertical");

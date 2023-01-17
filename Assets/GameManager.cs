@@ -20,10 +20,13 @@ public sealed class GameManager : NetworkBehaviour
     public GameObject Boxes;
     public int PlayerConnected=0;
     public TextMeshProUGUI IP;
-    public GameObject UIStuff;
+    public GameObject UIStuff,StartB,RestartB;
     public TMP_InputField ipunt;
     UNetTransport Transport;
-    string IPAd;
+    [HideInInspector] public int alivePlayers;
+    [HideInInspector]
+    public NetworkVariable<bool> IsGame_Active = new NetworkVariable<bool>(false);
+
 
     private void Awake()
     {
@@ -81,18 +84,29 @@ public sealed class GameManager : NetworkBehaviour
         {
             if (ip.AddressFamily == AddressFamily.InterNetwork)
             {
-                
-                IP.text = Transport.ConnectAddress + "  " + ip.ToString();
-                IPAd = ip.ToString(); 
+                IP.text = ip.ToString();
             }
         }
     }
 
     void Update()
     {
+        if (alivePlayers < 1 && IsHost && IsGame_Active.Value)
+        {
+            IsGame_Active.Value = false;
+            StartB.SetActive(true);
+
+            Debug.Log("MOOOOOOOOOOOOOOOOOOOOOO");
+        }
     }
 
+    public void StartGame()
+    {
 
+        IsGame_Active.Value = true;
+        StartB.SetActive(false);
+        alivePlayers = NetworkManager.Singleton.ConnectedClients.Count;
+    }
 
     public void HandleServerStart()
     {
@@ -152,10 +166,11 @@ public sealed class GameManager : NetworkBehaviour
         string g= ipunt.text;
 
         Transport.ConnectAddress = g; //
-        
+        IP.text = g;
 
         GameObject.Find("StartGame").SetActive(false);
         NetworkManager.Singleton.StartClient();
+       
        
     }
 

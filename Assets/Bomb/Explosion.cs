@@ -27,8 +27,9 @@ public class Explosion : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            Debug.Log("PIUPIU");
+            
             collision.transform.gameObject.SetActive(false);
+            GameManager.Instance.alivePlayers--;
         }
     }
 }
