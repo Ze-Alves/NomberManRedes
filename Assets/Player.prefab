@@ -148,11 +148,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d588c3b1bd0286149ad5f463f39fbc3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
+  moveSpeed: 5
   bomb: {fileID: 4277798018512416624, guid: cb81b06c0a637af4b87c6515fdf649a6, type: 3}
   PStats: {fileID: 5076705660249572696, guid: 37e814c79eb7b734ea2a10d9f082f993, type: 3}
   power: 1
   bombCount: 1
+  alive: 0
+  sprite: {fileID: 6270833626126101688}
 --- !u!114 &3192939707269621339
 MonoBehaviour:
   m_ObjectHideFlags: 0

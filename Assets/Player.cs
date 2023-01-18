@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour
     public int power, bombCount;
     int playerNumber;
     [HideInInspector]public bool alive;
+    [SerializeField] SpriteRenderer sprite;
     
     void Start()
     {
@@ -156,25 +157,29 @@ public class Player : NetworkBehaviour
               
                 case 1:
                     Posi = new Vector3(-5.5f, 3.5f, 0);
+                    sprite.color = Color.red;
                     break;
                 case 2:
                     Posi = new Vector3(1.5f, 3.5f, 0);
                     statusPos.y -= 3.5f;
+                    sprite.color = Color.green;
 
                     break;
                 case 3:
                     Posi = new Vector3(1.5f, -3.5f, 0);
                     statusPos.x += 14f;
+                    sprite.color = Color.blue;
                     break;
                 case 4:
                     Posi = new Vector3(-5.5f, 3.5f, 0);
                     statusPos.y -= 3.5f;
                     statusPos.x += 14f;
+                    sprite.color = Color.yellow;
                     break;
             }
             transform.position = Posi;
             playerNumber = GameManager.Instance.PlayerConnected;
-            StatusServerRpc(statusPos);
+            StatusServerRpc(statusPos,sprite.color);
         }
             GetComponent<SpriteRenderer>().enabled = true;
             //Debug.Log(pos+"UUUUUUUUUU"+transform.position+GameManager.Instance.PlayerConnected);
@@ -183,25 +188,21 @@ public class Player : NetworkBehaviour
     }
 
     [ServerRpc]
-    void StatusServerRpc(Vector2 pos)
+    void StatusServerRpc(Vector2 pos,Color color)
     {
         stats = Instantiate(PStats, pos, Quaternion.identity);
 
         stats.GetComponent<NetworkObject>().Spawn();
 
         stats.GetComponent<PlayerStats>().PlayerNum.Value=playerNumber;
-        StatusClientRpc(pos);
+        StatusClientRpc(color);
 
     }
 
     [ClientRpc]
-    void StatusClientRpc(Vector3 pos)
+    void StatusClientRpc(Color color)
     {
-        Debug.Log("RRRRRRRRR");
-        //stats = Instantiate(PStats, pos, Quaternion.identity);
-        //stats.GetComponent<PlayerStats>().p++;
-        Debug.Log("RAR");
-
+        sprite.color = color;
     }
 
     [ServerRpc]
@@ -215,7 +216,7 @@ public class Player : NetworkBehaviour
     public void ResetSats()
     {
         power = 1;
-        moveSpeed = 7;
+        moveSpeed = 5;
         bombCount = 1;
         alive = true;
         if(IsOwner)
