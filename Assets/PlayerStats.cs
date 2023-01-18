@@ -61,5 +61,6 @@ public class PlayerStats : NetworkBehaviour
     void Update()
     {
         pnum.text = "Player " + PlayerNum.Value.ToString();
+        Debug.Log("PDLE" + PlayerNum.Value);
     }
 }
