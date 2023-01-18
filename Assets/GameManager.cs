@@ -23,9 +23,10 @@ public sealed class GameManager : NetworkBehaviour
     public GameObject UIStuff,StartB,RestartB;
     public TMP_InputField ipunt;
     UNetTransport Transport;
-    [HideInInspector] public int alivePlayers;
+    [HideInInspector] public NetworkVariable<int> alivePlayers = new NetworkVariable<int>();
     [HideInInspector]
     public NetworkVariable<bool> IsGame_Active = new NetworkVariable<bool>(false);
+    public GameObject WinScreen, LoseScreen;
 
 
     private void Awake()
@@ -91,13 +92,37 @@ public sealed class GameManager : NetworkBehaviour
 
     void Update()
     {
-        if (alivePlayers < 1 && IsHost && IsGame_Active.Value)
+        if (alivePlayers.Value < 2 && IsGame_Active.Value)
         {
-            IsGame_Active.Value = false;
-            StartB.SetActive(true);
+            if (IsHost)
+            {
+                IsGame_Active.Value = false;
+                RestartB.SetActive(true);
+                EndGamClientRpc();
+            }
+           
 
             Debug.Log("MOOOOOOOOOOOOOOOOOOOOOO");
         }
+    }
+
+    [ClientRpc]
+    void EndGamClientRpc()
+    {
+        foreach (Player player in FindObjectsOfType<Player>(true))
+        {
+            if (player.IsOwner)
+                EndScreen(player.alive);
+            Debug.Log(player.alive+"Fush");
+        }
+    }
+
+    public void EndScreen(bool screen)
+    {
+        if (screen)
+            WinScreen.SetActive(true);
+        else
+            LoseScreen.SetActive(true);
     }
 
     public void StartGame()
@@ -105,8 +130,54 @@ public sealed class GameManager : NetworkBehaviour
 
         IsGame_Active.Value = true;
         StartB.SetActive(false);
-        alivePlayers = NetworkManager.Singleton.ConnectedClients.Count;
+        alivePlayers.Value = NetworkManager.Singleton.ConnectedClients.Count;
     }
+
+    public void RestartMatch()
+    {
+
+        if (IsServer)
+            RestartMatchServerRpc();
+    }
+
+
+    [ServerRpc]
+    void RestartMatchServerRpc()
+    {
+        StartB.SetActive(true);
+        RestartB.SetActive(false);
+
+        RestartMatchClientRpc();
+
+    }
+
+    [ClientRpc]
+    void RestartMatchClientRpc()
+    {
+        for (int i = 0; i < Boxes.transform.childCount; i++)
+        {
+            Boxes.transform.GetChild(i).gameObject.SetActive(true);
+        }
+
+
+
+        foreach (Item item in Object.FindObjectsOfType<Item>())
+        {
+            Destroy(item.gameObject);
+        }
+
+        foreach (Player player in FindObjectsOfType<Player>(true))
+        {
+            
+            player.gameObject.SetActive(true);
+            player.ResetSats();
+        }
+
+        WinScreen.SetActive(false);
+        LoseScreen.SetActive(false);
+    }
+
+    #region ServerStuff
 
     public void HandleServerStart()
     {
@@ -180,40 +251,8 @@ public sealed class GameManager : NetworkBehaviour
         GameObject.Find("Client").SetActive(false);
         UIStuff.SetActive(true);
     }
+    #endregion
 
-
-    public void RestartMatch()
-    {
-        if (IsServer)
-            RestartMatchServerRpc();
-    }
-
-    [ServerRpc]
-    void RestartMatchServerRpc()
-    {
-        RestartMatchClientRpc();
-    }
-
-    [ClientRpc]
-    void RestartMatchClientRpc()
-    {
-        for (int i = 0; i < Boxes.transform.childCount; i++)
-        {
-            Boxes.transform.GetChild(i).gameObject.SetActive(true);
-        }
-        
-
-
-        foreach(Item item in Object.FindObjectsOfType<Item>())
-        {
-            Destroy(item.gameObject);
-        }
-
-        foreach (Player player in FindObjectsOfType<Player>(true))
-        {
-            player.gameObject.SetActive(true);
-            player.ResetSats();
-        }
-    }
+   
 
 }

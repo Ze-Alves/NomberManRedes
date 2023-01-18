@@ -58,7 +58,7 @@ public class Bomb : MonoBehaviour
                         if (hit.transform.tag == "Player")
                         {
                             hit.transform.gameObject.SetActive(false);
-                            GameManager.Instance.alivePlayers--;
+                            
                         }
                         RaycastHit2D hit2 = Physics2D.Raycast(RaycastPos, new Vector2(w, 0), RaySize);
                         if (hit2 && hit2.transform.tag == "Box")

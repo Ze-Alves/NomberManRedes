@@ -14,6 +14,7 @@ public class Player : NetworkBehaviour
     GameObject stats;
     public int power, bombCount;
     int playerNumber;
+    [HideInInspector]public bool alive;
     
     void Start()
     {
@@ -24,12 +25,28 @@ public class Player : NetworkBehaviour
         //Debug.Log("sadasd"+transform.position);
        
         rigidbody = GetComponent<Rigidbody>();
-
-        if(IsOwner)
-        PlayerNumServerRpc();
+        alive = true;
+        //if(IsOwner)
+        //    PlayerNumServerRpc();
         StartCoroutine(UpdatePos());
         
     }
+
+    private void OnDisable()
+    {
+
+        Debug.Log("Disabled");
+        if (IsHost)
+            GameManager.Instance.alivePlayers.Value--;
+        foreach (Player player in FindObjectsOfType<Player>(true))
+        {
+            
+            
+        }
+        if (IsOwner)
+        alive = false;
+    }
+
 
     [ServerRpc]
     void PlayerNumServerRpc()
@@ -46,7 +63,15 @@ public class Player : NetworkBehaviour
 
             if (Input.GetKeyDown(KeyCode.E))
                 PlaceBomb();
+
+            //if (GameManager.Instance.alivePlayers.Value < 2)
+            //{
+            //    GameManager.Instance.EndScreen(alive);
+            //}
+
         }
+
+        Debug.Log(alive);
     }
 
     private void FixedUpdate()
@@ -105,7 +130,7 @@ public class Player : NetworkBehaviour
         bombe.size = power;
         bombe.owner = this;
         //bombe.gameObject.GetComponent<NetworkObject>().Spawn();
-        Debug.Log("QQQQQQQFFFFFF");
+       
     }
 
 
@@ -128,17 +153,27 @@ public class Player : NetworkBehaviour
             Vector3 statusPos=PStats.transform.position;
             switch (GameManager.Instance.PlayerConnected)
             {
+              
                 case 1:
-                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
                     break;
                 case 2:
-                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    Posi = new Vector3(1.5f, 3.5f, 0);
                     statusPos.y -= 3.5f;
-                    break;
 
+                    break;
+                case 3:
+                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    statusPos.x += 14f;
+                    break;
+                case 4:
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
+                    statusPos.y -= 3.5f;
+                    statusPos.x += 14f;
+                    break;
             }
             transform.position = Posi;
-
+            playerNumber = GameManager.Instance.PlayerConnected;
             StatusServerRpc(statusPos);
         }
             GetComponent<SpriteRenderer>().enabled = true;
@@ -182,6 +217,7 @@ public class Player : NetworkBehaviour
         power = 1;
         moveSpeed = 7;
         bombCount = 1;
+        alive = true;
         if(IsOwner)
         ChangeStatusServerRpc(0);
 
@@ -191,13 +227,22 @@ public class Player : NetworkBehaviour
             switch (playerNumber)
             {
                 case 1:
-                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
                     break;
                 case 2:
+                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    break;
+                case 3:
                     Posi = new Vector3(1.5f, -3.5f, 0);
                     break;
+                case 4:
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
+                    break;
+
 
             }
+                    Debug.Log(playerNumber + "SUSH");
+
             transform.position = Posi;
         }
     }

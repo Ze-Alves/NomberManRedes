@@ -29,7 +29,7 @@ public class Explosion : MonoBehaviour
         {
             
             collision.transform.gameObject.SetActive(false);
-            GameManager.Instance.alivePlayers--;
+            //GameManager.Instance.alivePlayers--;
         }
     }
 }
