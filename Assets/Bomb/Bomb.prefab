@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9077322803026622118}
   - component: {fileID: 2627838375895840113}
   - component: {fileID: -2099286102343721924}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,6 +114,9 @@ MonoBehaviour:
   animator: {fileID: 2627838375895840113}
   animation: {fileID: 0}
   owner: {fileID: 0}
+  mask:
+    serializedVersion: 2
+    m_Bits: 55
 --- !u!61 &9077322803026622118
 BoxCollider2D:
   m_ObjectHideFlags: 0

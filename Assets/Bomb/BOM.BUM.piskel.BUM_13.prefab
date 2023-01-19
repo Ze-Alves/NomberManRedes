@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3703866454505905035}
   - component: {fileID: 4705998849360176126}
   - component: {fileID: -4650665681023671474}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BOM.BUM.piskel.BUM_13
   m_TagString: Untagged
   m_Icon: {fileID: 0}

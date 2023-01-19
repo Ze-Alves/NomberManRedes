@@ -41,7 +41,6 @@ public sealed class GameManager : NetworkBehaviour
 
     void Start()
     {
-
         NetworkManager.Singleton.OnServerStarted += HandleServerStart;
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
 
@@ -49,7 +48,6 @@ public sealed class GameManager : NetworkBehaviour
         {
             if (!IsOwnedByServer&&FindObjectOfType<RestartManager>()!=null)
             {
-                
                 if (FindObjectOfType<RestartManager>().host)
                 {
                     CreateHost();
@@ -100,9 +98,6 @@ public sealed class GameManager : NetworkBehaviour
                 RestartB.SetActive(true);
                 EndGamClientRpc();
             }
-           
-
-            Debug.Log("MOOOOOOOOOOOOOOOOOOOOOO");
         }
     }
 
@@ -113,7 +108,6 @@ public sealed class GameManager : NetworkBehaviour
         {
             if (player.IsOwner)
                 EndScreen(player.alive);
-            Debug.Log(player.alive+"Fush");
         }
     }
 
@@ -217,6 +211,7 @@ public sealed class GameManager : NetworkBehaviour
     public void CreateHost()
     {
         GameObject.Find("StartGame").SetActive(false);
+        StartB.SetActive(true);
         NetworkManager.Singleton.StartHost();
     }
 

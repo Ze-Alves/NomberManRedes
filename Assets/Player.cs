@@ -196,19 +196,22 @@ public class Player : NetworkBehaviour
         switch (type)
         {
             case Item.ItemType.Power:
+                power++;
+
                 if (IsOwner)
                     ChangeStatusServerRpc(1);
-                power++;
                 break;
             case Item.ItemType.Bombs:
-                if(IsOwner)
-                ChangeStatusServerRpc(2);
                 bombCount++;
+
+                if (IsOwner)
+                ChangeStatusServerRpc(2);
                 break;
             case Item.ItemType.Speed:
+                moveSpeed++;
+
                 if (IsOwner)
                     ChangeStatusServerRpc(3);
-                moveSpeed++;
                 break;
         }
     }

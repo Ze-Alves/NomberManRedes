@@ -16,6 +16,7 @@ public class Item : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            Debug.Log(type);
             other.GetComponent<Player>().ItemPick(type);
             Destroy(gameObject);
         }
