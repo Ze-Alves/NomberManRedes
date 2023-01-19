@@ -10,15 +10,8 @@ public class Explosion : MonoBehaviour
         StartCoroutine(Die());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
     IEnumerator Die()
     {
-
         yield return new WaitForSeconds(.5f);
         Destroy(gameObject);
     }
@@ -27,9 +20,7 @@ public class Explosion : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            
             collision.transform.gameObject.SetActive(false);
-            //GameManager.Instance.alivePlayers--;
         }
     }
 }

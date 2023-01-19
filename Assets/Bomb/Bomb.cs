@@ -9,7 +9,6 @@ public class Bomb : MonoBehaviour
     
     public int probi;
     public int size = 2;
-    //public float xsize, ysize;
     float RaySize = 1;
 
     public GameObject Explosionx, Explosiony,ExplosionEndx,ExplosionEndy,centro;
@@ -20,14 +19,7 @@ public class Bomb : MonoBehaviour
 
     void Start()
     {
-        //StartCoroutine(Explode());
         animator.Play("BombExplode");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void Explosion()
@@ -233,59 +225,11 @@ public class Bomb : MonoBehaviour
     void BoxDestroy(GameObject box)
     {
 
-        //int r = Random.Range(0, Items.Count);
-        //int prob = Random.Range(0, 100);
-        //if (prob < probi)
-        //{
-
-        //    //BoxDestroyServerRpc(box, r);
-        //    Instantiate(Items[r], box.transform.position, Quaternion.identity);
-        //}
-        //Debug.Log(IsLocalPlayer + "" + IsSpawned + "" + IsOwnedByServer + "" + IsServer + "" + IsHost);
-
-        //if (IsOwnedByServer)
-        //{
-        //    Debug.Log("KKKKKKKKKKKKK");
-        //    BoxDestroyServerRpc(box.transform.position);
-        //}
-        //Destroy(box);
-
-        //NetworkBehaviour me;
-        //if(refer.TryGet(out me,NetworkManager.Singleton))
-        //{
-        //    Debug.Log("Meeme");
-        //    if (me == this)
-        //        Debug.Log("YESSSSSSSSSSSSSS");
-        //}
         box.GetComponent<Box>().Exploded();
     }
-
-    [ServerRpc]
-    void BoxDestroyServerRpc(Vector3 pos)
-    {
-        Debug.Log("OOOOOOOOOOOOOOOOOOOOOOO");
-        int r = Random.Range(0, Items.Count);
-        int prob = Random.Range(0, 100);
-        if (prob < probi)
-        {
-
-            //BoxDestroyServerRpc(box, r);
-            BoxDestroyClientRpc(r,pos);
-
-        }
-    }
-
-    [ClientRpc]
-    void BoxDestroyClientRpc(int r,Vector3 pos)
-    {
-        Instantiate(Items[r], pos, Quaternion.identity);
-        Debug.Log("EEEEEEEEEEEEEEE");
-    }
-
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         GetComponent<BoxCollider2D>().isTrigger = false;
-        Debug.Log("Saiu");
     }
 }

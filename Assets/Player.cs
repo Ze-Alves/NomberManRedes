@@ -23,25 +23,15 @@ public class Player : NetworkBehaviour
         alive = true;
         StartCoroutine(UpdatePos());
         sprite.color = cor.Value;
-        
     }
 
     private void OnDisable()
     {
-
-        Debug.Log("Disabled");
         if (IsHost)
             GameManager.Instance.alivePlayers.Value--;
       
         if (IsOwner)
         alive = false;
-    }
-
-
-    [ServerRpc]
-    void PlayerNumServerRpc()
-    {
-        playerNumber = NetworkManager.Singleton.ConnectedClients.Count;
     }
 
     void Update()
@@ -54,8 +44,6 @@ public class Player : NetworkBehaviour
             if (Input.GetKeyDown(KeyCode.E))
                 PlaceBomb();
         }
-
-        Debug.Log(alive);
     }
 
     private void FixedUpdate()
@@ -114,12 +102,10 @@ public class Player : NetworkBehaviour
         {
             yield return new WaitForSeconds(.3f);
 
-
             Vector3 Posi = new Vector3(0, 0, 0);
             Vector3 statusPos=PStats.transform.position;
             switch (GameManager.Instance.PlayerConnected)
             {
-              
                 case 1:
                     Posi = new Vector3(-5.5f, 3.5f, 0);
                     sprite.color = Color.red;
@@ -164,12 +150,6 @@ public class Player : NetworkBehaviour
         cor.Value = color;
         sprite.color = color;
 
-    }
-
-    [ClientRpc]
-    void StatusClientRpc(Color color)
-    {
-        sprite.color = color;
     }
 
     [ServerRpc]

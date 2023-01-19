@@ -146,9 +146,7 @@ public sealed class GameManager : NetworkBehaviour
     {
         StartB.SetActive(true);
         RestartB.SetActive(false);
-
         RestartMatchClientRpc();
-
     }
 
     [ClientRpc]
@@ -159,8 +157,6 @@ public sealed class GameManager : NetworkBehaviour
             Boxes.transform.GetChild(i).gameObject.SetActive(true);
         }
 
-
-
         foreach (Item item in Object.FindObjectsOfType<Item>())
         {
             Destroy(item.gameObject);
@@ -168,11 +164,9 @@ public sealed class GameManager : NetworkBehaviour
 
         foreach (Player player in FindObjectsOfType<Player>(true))
         {
-            
             player.gameObject.SetActive(true);
             player.ResetSats();
         }
-
         WinScreen.SetActive(false);
         LoseScreen.SetActive(false);
     }
@@ -191,8 +185,6 @@ public sealed class GameManager : NetworkBehaviour
     {
         if(IsOwner)
         UpdateCountServerRpc();
-
-
     }
 
     [ServerRpc]
@@ -219,30 +211,24 @@ public sealed class GameManager : NetworkBehaviour
     [ClientRpc]
     public void BoxClientRpc(int r,Vector2 pos)
     {
-        Debug.Log("GRAU");
         Instantiate(Items[r], pos, Quaternion.identity);
     }
 
     public void CreateHost()
     {
-   
         GameObject.Find("StartGame").SetActive(false);
         NetworkManager.Singleton.StartHost();
-        
     }
 
     public void Client()
     {
-
         string g= ipunt.text;
 
-        Transport.ConnectAddress = g; //
+        Transport.ConnectAddress = g; 
         IP.text = g;
 
         GameObject.Find("StartGame").SetActive(false);
         NetworkManager.Singleton.StartClient();
-       
-       
     }
 
     public void ClientConnectMenu()
