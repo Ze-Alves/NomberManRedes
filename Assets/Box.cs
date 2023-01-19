@@ -3,26 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-
-public class Box : NetworkBehaviour//MonoBehaviour
+public class Box : NetworkBehaviour
 {
-    // Start is called before the first frame update
-   
     public List<GameObject> Items;
     public float chance;
     int item;
     bool spawn=false;
     bool dead = false;
-    // Update is called once per frame
     private void Start()
     {
         item = Random.Range(0, Items.Count);
         int prob = Random.Range(0, 100);
         if (prob < chance)
         {
-
             spawn = true;
-
         }
         NetworkManager.Singleton.OnServerStarted += Spawn ;
       
@@ -34,8 +28,6 @@ public class Box : NetworkBehaviour//MonoBehaviour
     }
     void Update()
     {
-        //Debug.Log(IsLocalPlayer + "" + IsSpawned + "" + IsOwnedByServer + "" + IsServer + "" + IsHost);
-
         if (dead)
         {
             Instantiate(Items[item], transform.position, Quaternion.identity);
@@ -46,7 +38,6 @@ public class Box : NetworkBehaviour//MonoBehaviour
 
     public void Exploded()
     {
-        //dead = true;
         if(IsOwner)
         BoxDestroyServerRpc();
     }
@@ -56,25 +47,13 @@ public class Box : NetworkBehaviour//MonoBehaviour
     void BoxDestroyServerRpc()
     {
         BoxDestroyClientRpc();
-        //GetComponent<NetworkObject>().Despawn();
-        //Destroy(gameObject);
     }
 
     [ClientRpc]
     void BoxDestroyClientRpc()
     {
-
         gameObject.SetActive(false);
-        //Instantiate(Items[r],transform.position, Quaternion.identity);
     }
-
-
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-
-    //    Destroy(gameObject);
-    //}
 
     private void OnDestroy()
     {

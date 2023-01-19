@@ -14,27 +14,24 @@ public class Player : NetworkBehaviour
     GameObject stats;
     public int power, bombCount;
     int playerNumber;
-    
+    [HideInInspector]public bool alive;
+    [SerializeField] SpriteRenderer sprite;
+    NetworkVariable<Color> cor = new NetworkVariable<Color>();
     void Start()
     {
-        //NetworkManager.Singleton.OnClientConnectedCallback += UpdatePos;
-        //if (IsOwner)
-        //    GameManager.Instance.UpdateCountServerRpc();
-        
-        //Debug.Log("sadasd"+transform.position);
-       
         rigidbody = GetComponent<Rigidbody>();
-
-        if(IsOwner)
-        PlayerNumServerRpc();
+        alive = true;
         StartCoroutine(UpdatePos());
-        
+        sprite.color = cor.Value;
     }
 
-    [ServerRpc]
-    void PlayerNumServerRpc()
+    private void OnDisable()
     {
-        playerNumber = NetworkManager.Singleton.ConnectedClients.Count;
+        if (IsHost)
+            GameManager.Instance.alivePlayers.Value--;
+      
+        if (IsOwner)
+        alive = false;
     }
 
     void Update()
@@ -51,30 +48,22 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        //rigidbody.velocity = Vector3.zero;
-
-        //rigidbody.AddForce(xInput * moveSpeed, 0, yInput * moveSpeed);
         transform.position += new Vector3(xInput * moveSpeed * Time.deltaTime, yInput * moveSpeed * Time.deltaTime);
     }
 
 
     void PlaceBomb()
     {
-        //Debug.Log("lool"+bombs);
-
         if (bombCount > 0)
         {
             float xPos = Mathf.Ceil(transform.position.x);
             float yPos = Mathf.Ceil(transform.position.y);
-            //StatusClientRpc();
-            //ChangeStatusServerRpc();
 
             Vector2 BombPos = new Vector2(xPos - .5f, yPos - .5f);
 
             if (!GameManager.Instance.BomPoses.Contains(BombPos))
             {
                 PlaceBombServerRpc(BombPos);
-                //Instantiate(bomb, BombPos, Quaternion.identity).GetComponent<Bomb>().size = power;
 
                 bombCount--;
                 StartCoroutine(BombExplode(BombPos));
@@ -87,25 +76,15 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     void PlaceBombServerRpc(Vector2 pos)
     {
-        //NetworkObject bombe = Instantiate(bomb, pos, Quaternion.identity);
-        //bombe.gameObject.GetComponent<Bomb>().size = power;
-        //bombe.Spawn();
-        //bombe.SpawnWithOwnership(NetworkManager.Singleton.LocalClientId);
-        //Debug.Log("QQQQQQQ");
         PlaceBombClientRpc(pos);
     }
 
     [ClientRpc]
     void PlaceBombClientRpc(Vector2 pos)
     {
-        //obj.
-        //bombe.gameObject.GetComponent<Bomb>().size = power;
-
         Bomb bombe = Instantiate(bomb, pos, Quaternion.identity).GetComponent<Bomb>();
         bombe.size = power;
         bombe.owner = this;
-        //bombe.gameObject.GetComponent<NetworkObject>().Spawn();
-        Debug.Log("QQQQQQQFFFFFF");
     }
 
 
@@ -123,65 +102,70 @@ public class Player : NetworkBehaviour
         {
             yield return new WaitForSeconds(.3f);
 
-
             Vector3 Posi = new Vector3(0, 0, 0);
             Vector3 statusPos=PStats.transform.position;
             switch (GameManager.Instance.PlayerConnected)
             {
                 case 1:
-                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
+                    sprite.color = Color.red;
+                    playerNumber = 1;
                     break;
                 case 2:
-                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    Posi = new Vector3(1.5f, 3.5f, 0);
                     statusPos.y -= 3.5f;
+                    sprite.color = Color.green;
+                    playerNumber = 2;
                     break;
-
+                case 3:
+                    Posi = new Vector3(1.5f, -3.5f, 0);
+                    statusPos.x += 14f;
+                    sprite.color = Color.blue;
+                    playerNumber = 3;
+                    break;
+                case 4:
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
+                    statusPos.y -= 3.5f;
+                    statusPos.x += 14f;
+                    sprite.color = Color.yellow;
+                    playerNumber=4;
+                    break;
+                    
             }
             transform.position = Posi;
-
-            StatusServerRpc(statusPos);
+            StatusServerRpc(statusPos,sprite.color,playerNumber);
         }
             GetComponent<SpriteRenderer>().enabled = true;
-            //Debug.Log(pos+"UUUUUUUUUU"+transform.position+GameManager.Instance.PlayerConnected);
-
-        
     }
 
     [ServerRpc]
-    void StatusServerRpc(Vector2 pos)
+    void StatusServerRpc(Vector2 pos,Color color,int p)
     {
         stats = Instantiate(PStats, pos, Quaternion.identity);
 
         stats.GetComponent<NetworkObject>().Spawn();
 
-        stats.GetComponent<PlayerStats>().PlayerNum.Value=playerNumber;
-        StatusClientRpc(pos);
+        stats.GetComponent<PlayerStats>().PlayerNum.Value=p;
 
-    }
-
-    [ClientRpc]
-    void StatusClientRpc(Vector3 pos)
-    {
-        Debug.Log("RRRRRRRRR");
-        //stats = Instantiate(PStats, pos, Quaternion.identity);
-        //stats.GetComponent<PlayerStats>().p++;
-        Debug.Log("RAR");
+        cor.Value = color;
+        sprite.color = color;
 
     }
 
     [ServerRpc]
-    void ChangeStatusServerRpc(int type)
+    void ChangeStatusServerRpc(int ty)
     {
-                stats.GetComponent<PlayerStats>().Power.Value=power;
-                stats.GetComponent<PlayerStats>().bombCount.Value=bombCount;
-                stats.GetComponent<PlayerStats>().Speed.Value=moveSpeed;
+      stats.GetComponent<PlayerStats>().Power.Value=power;
+      stats.GetComponent<PlayerStats>().bombCount.Value=bombCount;
+      stats.GetComponent<PlayerStats>().Speed.Value=moveSpeed;
     }
 
     public void ResetSats()
     {
         power = 1;
-        moveSpeed = 7;
+        moveSpeed = 5;
         bombCount = 1;
+        alive = true;
         if(IsOwner)
         ChangeStatusServerRpc(0);
 
@@ -191,12 +175,17 @@ public class Player : NetworkBehaviour
             switch (playerNumber)
             {
                 case 1:
-                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
                     break;
                 case 2:
+                    Posi = new Vector3(1.5f, 3.5f, 0);
+                    break;
+                case 3:
                     Posi = new Vector3(1.5f, -3.5f, 0);
                     break;
-
+                case 4:
+                    Posi = new Vector3(-5.5f, 3.5f, 0);
+                    break;
             }
             transform.position = Posi;
         }
